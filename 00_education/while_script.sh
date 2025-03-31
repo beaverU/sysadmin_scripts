@@ -1,6 +1,6 @@
 #!/bin/bash
 while ping -c 1 google.com >/dev/null 2>&1; do
-  echo "Google доступен"
+  echo "Google is reachable"
   sleep 1
 done
-  echo "Google недоступен"
+  echo "Google is unreachable"
