@@ -9,23 +9,33 @@ VERBOSE=false
 log_message() {
   local message=$1
   local priority=$2
-  logger -p "$priority" "$message"
-}
-
-cleanup() {
-  if [[ -e "$TMP_FILE" ]]; then
-    rm /tmp/sec.cache
+  logger -p "user.$priority" -t "check_security_updates_basic.sh" "$message"
+  if $VERBOSE; then
+    echo "[$priority] $message"
   fi
 }
 
 # Checking script's args
 args_setup() {
-  while getopts ":vh" opt; do
+  while getopts ":v" opt; do
     case $opt in
       v) VERBOSE=true; echo "Verbose mode on" ;;
       *) echo "Usage: $0 [-v]"; exit 1 ;;
     esac
   done
+}
+
+# Checks if required commands are available in PATH.
+check_dependencies() {
+  local dep
+  for dep in apt-get grep logger; do
+    if ! command -v "${dep}" >/dev/null 2>&1; then
+      log_message "'${dep}' is required but not installed. Please install it." "err"
+    fi
+  done
+  if ! command -v apt >/dev/null 2>&1; then
+      log_message "'apt' command not found. Is this an APT-based system (Debian/Ubuntu)?" "err"
+  fi
 }
 
 # Security updates check function
@@ -34,18 +44,16 @@ check_security_updates() {
   updates=$(apt-get -s upgrade 2>/dev/null | grep -i security | grep -i Inst| cut -d ' ' -f 2-4 | sed 's/(//g')
   if [[ -z "$updates" ]]; then
     log_message "All security updates are installed." "info"
-    "$VERBOSE" && echo "All security updates are installed."
   else
-    log_message "Security updates has found." "warning"
-    "$VERBOSE" && echo "Security updates has found." && echo "$updates"
+    log_message "Security updates has found. $updates" "warning"
   fi
 }
 
 main() {
 
-  trap cleanup EXIT
-
   args_setup "$@"
+
+  check_dependencies
   
   check_security_updates
   
