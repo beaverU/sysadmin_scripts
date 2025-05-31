@@ -1,0 +1,14 @@
+[user]
+        name = beaveru
+        email = <some_name>@<some_domain>.<some_TLD>
+[alias]
+        st = status
+        sw = switch
+        co = commit
+        a = add
+[push]
+        autoSetupRemote = true
+[help]
+        autocorrect = 1
+[core]
+        pager = less -RFX
