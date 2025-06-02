@@ -24,3 +24,5 @@ set mouse=a
 
 set lazyredraw         " Redraw screen only when needed (improves performance)
 set updatetime=300     " Reduce time for CursorHold events
+
+autocmd Filetype gitcommit setlocal spell textwidth=72
